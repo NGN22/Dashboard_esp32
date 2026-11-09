@@ -22,7 +22,7 @@ flowchart TB
     State["Estado global<br/>app_state.c / app_state.h"]
     Main["Coordinación y lógica<br/>main.c / alarm.c"]
     HTTP["HTTP Server<br/>http_server.c"]
-    Dashboard["Dashboard<br/>HTML / CSS / JS<br/>(previsto)"]
+    Dashboard["Dashboard<br/>spiffs/index.html<br/>app.js / style.css"]
     subgraph Outputs["Actuadores"]
         LEDs["led_status.c"]
     end
@@ -41,12 +41,11 @@ flowchart TB
     WiFi -->|Al conectarse inicia| HTTP
 ```
 
-El flujo principal sigue el esquema sensores → estado global → dashboard:
-`main.c` procesa las entradas y mantiene el estado mediante `app_state`; el
-servidor HTTP lo expone al dashboard. El flujo dashboard → actuadores representa
-una extensión prevista: hoy no hay interfaz web en el repositorio y la API solo
-implementa `GET /api/state`, sin recibir comandos para controlar la alarma o
-los LEDs.
+El flujo de consulta está implementado: `main.c` procesa las entradas y
+mantiene el estado mediante `app_state`; el servidor HTTP lo expone al
+dashboard. La interfaz actualiza los indicadores de Wi-Fi y alarma consultando
+`GET /api/state` cada segundo. El flujo dashboard → actuadores sigue pendiente:
+la API todavía no recibe comandos para controlar la alarma o los LEDs.
 
 ### Responsabilidades
 
@@ -83,13 +82,18 @@ responder con el estado JSON y servir los recursos presentes en SPIFFS.
 - Montaje de SPIFFS.
 - Servidor HTTP con `GET /api/state` para consultar el estado en JSON y una
   ruta para servir archivos estáticos desde SPIFFS.
+- Dashboard estático en `spiffs/` integrado a la imagen SPIFFS durante la
+  compilación (`index.html`, `app.js` y `style.css`).
+- Tabla de particiones del proyecto con una partición SPIFFS de 1 MB.
 
 ### Pendiente de integrar o validar
 
-- Agregar los archivos de la interfaz web a la imagen SPIFFS; actualmente no
-  hay archivos web en el repositorio.
-- Configurar y comprobar la partición SPIFFS en la tabla de particiones antes
-  de probar su montaje.
+- El dashboard muestra Wi-Fi y alarma. Las tarjetas de temperatura, humedad,
+  iluminación, aire acondicionado y tomacorrientes están preparadas en la
+  interfaz, pero sus valores aún no provienen de sensores o actuadores
+  implementados.
+- Agregar endpoints y lógica para controlar alarma y actuadores desde el
+  dashboard.
 - Implementar sensores de temperatura/humedad y control de iluminación,
   aire acondicionado y tomacorrientes. Esos campos aparecen en el JSON, pero
   todavía no tienen módulos que actualicen sus valores.
@@ -115,7 +119,10 @@ internas pull-up/pull-down.
 1. Instala ESP-IDF y abre una terminal con su entorno configurado.
 2. Configura `WIFI_SSID` y `WIFI_PASSWORD` en `main/wifi_manager.c` con los
    datos de tu red. No guardes credenciales reales en el repositorio.
-3. Revisa la configuración de particiones para confirmar que incluye SPIFFS.
+3. En `idf.py menuconfig`, selecciona **Partition Table → Custom partition
+   table CSV** y establece `partitions.csv` como archivo. La configuración
+   `sdkconfig` local está ignorada por Git, así que cada entorno debe verificar
+   este ajuste. La tabla define una partición SPIFFS de 1 MB.
 
 ## Compilar y flashear
 
@@ -127,13 +134,17 @@ idf.py build
 idf.py -p <PUERTO> flash monitor
 ```
 
-Reemplaza `<PUERTO>` por el puerto serie de la placa. Cuando el ESP32 se conecte
-a Wi-Fi, el monitor serial mostrará la dirección IP. Desde un dispositivo en
-la misma red se puede consultar:
+Reemplaza `<PUERTO>` por el puerto serie de la placa. La compilación genera la
+imagen SPIFFS y `FLASH_IN_PROJECT` hace que se incluya al flashear. Cuando el
+ESP32 se conecte a Wi-Fi, el monitor serial mostrará la dirección IP. Desde un
+dispositivo en la misma red se puede abrir el dashboard:
+
+```text
+http://<IP-DEL-ESP32>/
+```
+
+El endpoint JSON está disponible en:
 
 ```text
 http://<IP-DEL-ESP32>/api/state
 ```
-
-La raíz del servidor (`/`) intenta servir `/spiffs/index.html`; para usarla,
-primero hay que agregar la interfaz web a SPIFFS.
