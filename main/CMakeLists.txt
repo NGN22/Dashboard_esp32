@@ -1,16 +1,12 @@
-idf_component_register(
-    SRCS
-        "main.c"
-        "led_manager.c"
-        "http_server.c"
+idf_component_register(SRCS
+                        "main.c"
+                        "app_state.c"
+                        "alarm.c"
+                        "led_status.c"
+                        "intrusion_sensor.c"
+                        "ir_remote.c"
+                        "wifi_manager.c"
+                        "http_server.c"
+                        "spiffs_manager.c"
 
-    INCLUDE_DIRS "."
-
-    REQUIRES
-        esp_driver_gpio
-        esp_wifi
-        esp_netif
-        esp_event
-        nvs_flash
-        esp_http_server
-)
+                    INCLUDE_DIRS ".")
