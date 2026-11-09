@@ -14,6 +14,7 @@
 #define WIFI_SSID "wifissid"
 #define WIFI_PASS "pass1234"
 
+
 static const char *TAG = "WIFI_INIT";
 
 typedef enum
@@ -106,7 +107,14 @@ static void wifi_status_task(void *pvParameters)
 
 void app_main(void)
 {
+
+
+
     led_init();
+
+  
+
+
     wifi_state = WIFI_STATE_DISCONNECTED;
     xTaskCreate(
     wifi_status_task,
@@ -180,10 +188,6 @@ void app_main(void)
 
     ESP_LOGI(TAG, "WiFi iniciado");
     
-    
+   
 
-    while (1)
-    {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
 }
