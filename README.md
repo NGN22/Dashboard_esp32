@@ -1,4 +1,12 @@
-# ESP32 - Dashboard/panel de estado y servidor local
+# ESP32 - Home Monitoring Dashboard
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d6080a71-ecd7-4b03-b633-e5ec3278061b" alt="Dashboard ESP32" width="900">
+</p>
+
+
+## Objetivo
+Desarrollar un servidor web embebido sobre ESP32 para supervisar y controlar un sistema de alarma mediante una interfaz accesible desde cualquier dispositivo conectado a la misma red WiFi.
+
 
 Firmware para ESP32 desarrollado con ESP-IDF. El proyecto integra una alarma
 de intrusión, indicadores LED, control remoto infrarrojo y un servidor HTTP
