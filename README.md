@@ -1,4 +1,4 @@
-# ESP32 - Dashboar de estado y servidor local
+# ESP32 - Dashboard/panel de estado y servidor local
 
 Firmware para ESP32 desarrollado con ESP-IDF. El proyecto integra una alarma
 de intrusión, indicadores LED, control remoto infrarrojo y un servidor HTTP
